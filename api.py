@@ -18,8 +18,14 @@ params = {
     "units": "metric"  # Change to 'imperial' for Fahrenheit
 }
 
+# 🔌 Print a message before making the API call
+print("🔌 Testing OpenWeatherMap API connection...")
+
 # Make the API call
 response = requests.get(base_url, params=params)
+
+# ✅ Print the status code after the request
+print(f"✅ Status Code: {response.status_code}")
 
 # Handle response
 if response.status_code == 200:
