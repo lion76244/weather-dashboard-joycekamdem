@@ -17,15 +17,15 @@ Concept Connections: Which Week 1–10 skills feel strongest? Which need more pr
 Early Challenges: Any blockers (e.g., API keys, folder setup)?:
 
 Support Strategies: Which office hours or resources can help you move forward?:
-
+- Afsana walking me through how to do each point was very helpful
 
 🧠 Section 2: Feature Selection Rationale
 List three features + one enhancement you plan to build.
 
 #	Feature Name	Difficulty (1–3)	Why You Chose It / Learning Goal
-1
-2			
-3			
+1 Simple Statistics 
+2 Trend detection
+3 Weather History Tracker	
 Enhancement	–	Creative Visuals – Use canvas animations, emojis, or styled graphics for flair
 🧩 Tip: Pick at least one “level 3” feature to stretch your skills!
 
@@ -83,12 +83,16 @@ Week	Monday	Tuesday	Wednesday	Thursday	Key Milestone
 
 ⚠️ Section 6: Risk Assessment
 Identify at least 3 potential risks and how you’ll handle them.
+My Api does not connect with the key -- troubleshoot the key or revert
+my gui is not linking correctly --check the code and errors 
+my main gets messed up --revert to an old version 
 
 Risk	Likelihood (High/Med/Low)	Impact (High/Med/Low)	Mitigation Plan
 API Rate Limit	Medium	Medium	Add delays or cache recent results
 
 🤝 Section 7: Support Requests
 What specific help will you ask for in office hours or on Slack?
+I will ask for breakdown on the errors I am having, and check-ins for progress.
 
 ✅ Section 8: Before Monday (Start of Week 12)
 Complete these setup steps before Monday:
