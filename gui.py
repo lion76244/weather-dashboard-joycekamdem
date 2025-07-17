@@ -3,6 +3,13 @@ import tkinter as tk
 from api import fetch_current_weather
 from features.Simple_Statistics import plot_temperature, plot_humidity
 from features.data_collection import save_search, load_history
+from features.Trend_detection import log_weather_trend, plot_city_trend
+from features.Trend_detection import (
+    log_weather_trend,
+    plot_city_trend,
+    export_trends_to_csv
+)
+
 
 # --- GUI Callback Functions ---
 def show_weather():
@@ -14,7 +21,9 @@ def show_weather():
     else:
         display = f"🌤️ Weather in {result['city']}:\n{result['description']}, {result['temp']}°C"
         result_label.config(text=display)
+
         save_search(city, result["temp"])
+        log_weather_trend(city, result["temp"])  # ✅ Track weather over time
         update_history_buttons()
 
 def show_temp_plot():
@@ -25,10 +34,14 @@ def show_humidity_plot():
     city = city_entry.get()
     plot_humidity(city)
 
+def show_trend_plot():
+    city = city_entry.get()
+    plot_city_trend(city)
+
 def fetch_from_history(city):
     city_entry.delete(0, tk.END)
     city_entry.insert(0, city)
-    show_weather()
+    show_weather()  # ✅ Let show_weather handle all logic
 
 def update_history_buttons():
     for widget in history_frame.winfo_children():
@@ -48,19 +61,19 @@ def update_history_buttons():
 # --- GUI Layout ---
 root = tk.Tk()
 root.title("Weather Dashboard")
-root.geometry("420x400")
+root.geometry("420x450")
 root.resizable(False, False)
 
-# Entry for city name
+# City entry
 city_entry = tk.Entry(root, width=30, font=("Arial", 12))
 city_entry.pack(pady=10)
 city_entry.insert(0, "Enter city name")
 
-# Weather result label
+# Weather result display
 result_label = tk.Label(root, text="", font=("Arial", 12), wraplength=380, justify="center")
 result_label.pack(pady=10)
 
-# Get weather button
+# Weather button
 get_button = tk.Button(root, text="Get Weather", font=("Arial", 12), command=show_weather)
 get_button.pack()
 
@@ -71,10 +84,26 @@ plot_temp_button.pack(pady=5)
 plot_humidity_button = tk.Button(root, text="Show Humidity Plot", font=("Arial", 10), command=show_humidity_plot)
 plot_humidity_button.pack(pady=5)
 
-# Frame for history buttons
+# Trend plot button ✅
+trend_button = tk.Button(root, text="Show Trend", font=("Arial", 10), command=show_trend_plot)
+trend_button.pack(pady=5)
+
+# History buttons
 history_frame = tk.Frame(root)
 history_frame.pack(pady=10)
 update_history_buttons()
 
-# Start GUI
+# Start the GUI
 root.mainloop()
+
+# Button: Show 7-day trend
+tk.Button(root, text="Trend: 7 Days", font=("Arial", 10),
+          command=lambda: plot_city_trend(city_entry.get(), days=7)).pack(pady=2)
+
+# Button: Show 30-day trend
+tk.Button(root, text="Trend: 30 Days", font=("Arial", 10),
+          command=lambda: plot_city_trend(city_entry.get(), days=30)).pack(pady=2)
+
+# Button: Export all trends to CSV
+tk.Button(root, text="Export to CSV", font=("Arial", 10),
+          command=export_trends_to_csv).pack(pady=2)

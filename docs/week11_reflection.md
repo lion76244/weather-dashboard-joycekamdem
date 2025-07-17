@@ -121,11 +121,3 @@ Book office hours if you're still stuck on API setup
 ✅ File uploaded to GitHub repo /docs/
 ✅ Repo link submitted on Canvas
 
-📈 2. Weather Trend Logger
-📊 What it does: Every time a user requests the weather, store the city, date, and temperature in a local JSON or CSV file.
-
-🧠 Cool factor: Over time, build a personal weather history for any city they searched.
-
-💡 Bonus: Add a plot of their city’s weather changes across days.
-
---look at week 8 after class asignment
