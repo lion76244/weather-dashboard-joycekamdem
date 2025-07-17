@@ -1,49 +1,21 @@
+# gui.py
 import tkinter as tk
-import requests
-import os
-from dotenv import load_dotenv
+from api import fetch_current_weather
 from features.Simple_Statistics import plot_temperature, plot_humidity
 from features.data_collection import save_search, load_history
-
-# Load API key from .env
-load_dotenv()
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
-
-# --- Weather fetch function ---
-def get_weather(city):
-    if not API_KEY:
-        return "❌ API key not found. Make sure OPENWEATHER_API_KEY is set."
-
-    base_url = "http://api.openweathermap.org/data/2.5/weather"
-    params = {
-        "q": city,
-        "appid": API_KEY,
-        "units": "metric"
-    }
-
-    response = requests.get(base_url, params=params)
-
-    if response.status_code == 200:
-        data = response.json()
-        weather = data['weather'][0]['description'].capitalize()
-        temp = data['main']['temp']
-        return f"🌤️ Weather in {city}:\n{weather}, {temp}°C"
-    else:
-        return f"❌ Error {response.status_code}: {response.text}"
 
 # --- GUI Callback Functions ---
 def show_weather():
     city = city_entry.get()
-    result = get_weather(city)
-    result_label.config(text=result)
+    result = fetch_current_weather(city)
 
-    if "🌤️" in result:
-        try:
-            temp = result.split(",")[-1].strip("°C")
-            save_search(city, temp)
-            update_history_buttons()
-        except Exception as e:
-            print(f"⚠️ Could not save history: {e}")
+    if "error" in result:
+        result_label.config(text=result["error"])
+    else:
+        display = f"🌤️ Weather in {result['city']}:\n{result['description']}, {result['temp']}°C"
+        result_label.config(text=display)
+        save_search(city, result["temp"])
+        update_history_buttons()
 
 def show_temp_plot():
     city = city_entry.get()

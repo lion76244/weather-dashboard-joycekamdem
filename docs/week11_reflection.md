@@ -128,3 +128,4 @@ Book office hours if you're still stuck on API setup
 
 💡 Bonus: Add a plot of their city’s weather changes across days.
 
+--look at week 8 after class asignment

@@ -1,37 +1,33 @@
+
 import requests
 import os
+from dotenv import load_dotenv
 
-# Read the API key from the environment variable
-api_key = os.getenv("OPENWEATHER_API_KEY")
+# Load the API key once
+load_dotenv()
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
-if not api_key:
-    raise ValueError("API key not found. Make sure OPENWEATHER_API_KEY is set.")
+def fetch_current_weather(city):
+    if not API_KEY:
+        return {"error": "❌ API key not found. Make sure OPENWEATHER_API_KEY is set."}
 
-# Define the city and request URL
-city = "New York"
-base_url = "http://api.openweathermap.org/data/2.5/weather"
+    base_url = "http://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "q": city,
+        "appid": API_KEY,
+        "units": "metric"
+    }
 
-# Set query parameters
-params = {
-    "q": city,
-    "appid": api_key,
-    "units": "metric"  # Change to 'imperial' for Fahrenheit
-}
-
-# 🔌 Print a message before making the API call
-print("🔌 Testing OpenWeatherMap API connection...")
-
-# Make the API call
-response = requests.get(base_url, params=params)
-
-# ✅ Print the status code after the request
-print(f"✅ Status Code: {response.status_code}")
-
-# Handle response
-if response.status_code == 200:
-    data = response.json()
-    print(f"Weather in {city}: {data['weather'][0]['description'].capitalize()}")
-    print(f"Temperature: {data['main']['temp']}°C")
-else:
-    print(f"Error {response.status_code}: {response.text}")
-
+    try:
+        response = requests.get(base_url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "city": city,
+                "description": data['weather'][0]['description'].capitalize(),
+                "temp": data['main']['temp']
+            }
+        else:
+            return {"error": f"❌ Error {response.status_code}: {response.text}"}
+    except Exception as e:
+        return {"error": f"❌ Request failed: {str(e)}"}

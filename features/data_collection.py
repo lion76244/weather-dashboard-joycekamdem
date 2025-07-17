@@ -3,35 +3,39 @@ import os
 from datetime import datetime
 
 HISTORY_FILE = "search_history.json"
-MAX_HISTORY = 5  # number of recent cities to track
 
 def save_search(city, temp):
-    """Save a search record with city and timestamp to a local file."""
+    """Append a new search entry to the JSON file without overwriting previous entries."""
     entry = {
         "city": city,
         "temp": temp,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
     }
 
+    # Load existing history if file exists
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r") as f:
-            history = json.load(f)
+            try:
+                history = json.load(f)
+            except json.JSONDecodeError:
+                history = []
     else:
         history = []
 
-    # Remove duplicates, keep newest first
-    history = [h for h in history if h["city"].lower() != city.lower()]
-    history.insert(0, entry)
-    history = history[:MAX_HISTORY]
+    # Append the new entry (no deduping, no max cap)
+    history.append(entry)
 
+    # Save the updated history
     with open(HISTORY_FILE, "w") as f:
         json.dump(history, f, indent=2)
 
-def load_history():
-    """Return the list of recent city searches."""
+def load_history(limit=5):
+    """Load the full history but return only the most recent `limit` entries."""
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r") as f:
-            return json.load(f)
+            try:
+                history = json.load(f)
+                return history[-limit:][::-1]  # get most recent `limit` entries
+            except json.JSONDecodeError:
+                return []
     return []
-
-
