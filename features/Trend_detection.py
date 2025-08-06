@@ -4,8 +4,13 @@ import csv
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
-TREND_FILE = "trend_log.json"
-CSV_EXPORT_FILE = "trend_log_export.csv"
+# Set up correct paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FOLDER = os.path.join(BASE_DIR, "../data")
+os.makedirs(DATA_FOLDER, exist_ok=True)
+
+TREND_FILE = os.path.join(DATA_FOLDER, "trend_log.json")
+CSV_EXPORT_FILE = os.path.join(DATA_FOLDER, "trend_log_export.csv")
 
 def log_weather_trend(city, temp):
     """Log city, date, and temp to a JSON file for long-term tracking."""
@@ -20,6 +25,7 @@ def log_weather_trend(city, temp):
             try:
                 trends = json.load(f)
             except json.JSONDecodeError:
+                print("⚠️ Trend log is corrupted. Starting fresh.")
                 trends = []
     else:
         trends = []
@@ -39,6 +45,7 @@ def load_city_trends(city):
             trends = json.load(f)
             return [t for t in trends if t["city"].lower() == city.lower()]
         except json.JSONDecodeError:
+            print("⚠️ Could not load trend log.")
             return []
 
 def filter_trends(trends, days=None):

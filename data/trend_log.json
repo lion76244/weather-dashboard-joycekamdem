@@ -2,21 +2,21 @@
   {
     "city": "Austin",
     "temp": 33.86,
-    "timestamp": "2025-08-06 14:00"
+    "date": "2025-08-06"
   },
   {
     "city": "Houston",
     "temp": 33.91,
-    "timestamp": "2025-08-06 14:00"
+    "date": "2025-08-06"
   },
   {
     "city": "New york",
     "temp": 25.88,
-    "timestamp": "2025-08-06 14:04"
+    "date": "2025-08-06"
   },
   {
     "city": "Houston",
     "temp": 34.08,
-    "timestamp": "2025-08-06 14:07"
+    "date": "2025-08-06"
   }
 ]
