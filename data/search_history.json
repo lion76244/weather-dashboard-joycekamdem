@@ -18,5 +18,45 @@
     "city": "Houston",
     "temp": 34.08,
     "timestamp": "2025-08-06 14:07"
+  },
+  {
+    "city": "New York City",
+    "temp": 22.54,
+    "timestamp": "2025-08-06 20:26"
+  },
+  {
+    "city": "Sanford",
+    "temp": 26.57,
+    "timestamp": "2025-08-06 20:29"
+  },
+  {
+    "city": "Sanford",
+    "temp": 26.57,
+    "timestamp": "2025-08-06 20:30"
+  },
+  {
+    "city": "New York",
+    "temp": 22.51,
+    "timestamp": "2025-08-06 20:31"
+  },
+  {
+    "city": "Dallas",
+    "temp": 33.22,
+    "timestamp": "2025-08-06 20:33"
+  },
+  {
+    "city": "New York ",
+    "temp": 22.42,
+    "timestamp": "2025-08-06 20:41"
+  },
+  {
+    "city": "New York ",
+    "temp": 22.42,
+    "timestamp": "2025-08-06 20:44"
+  },
+  {
+    "city": "New York",
+    "temp": 22.33,
+    "timestamp": "2025-08-06 20:52"
   }
 ]

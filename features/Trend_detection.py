@@ -17,7 +17,7 @@ def log_weather_trend(city, temp):
     entry = {
         "city": city,
         "temp": temp,
-        "date": datetime.now().strftime("%Y-%m-%d")
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M")  # Now includes time
     }
 
     if os.path.exists(TREND_FILE):
@@ -57,12 +57,21 @@ def filter_trends(trends, days=None):
     filtered = []
     for entry in trends:
         try:
-            entry_date = datetime.strptime(entry["date"], "%Y-%m-%d")
+            entry_date = datetime.strptime(entry["date"], "%Y-%m-%d %H:%M")  # Updated to match new format
             if entry_date >= cutoff:
                 filtered.append(entry)
         except Exception:
             continue
     return filtered
+
+def apply_plot_styling(ax, title, ylabel):
+    ax.set_title(title, fontsize=14, fontweight='bold', pad=15)
+    ax.set_xlabel("Date & Time", fontsize=11)  # Updated label
+    ax.set_ylabel(ylabel, fontsize=11)
+    ax.tick_params(axis='x', rotation=45)
+    ax.grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
+    ax.set_facecolor("#f9f9f9")
+    plt.tight_layout()
 
 def plot_city_trend(city, days=None):
     """Plot temperature trend for a city. Optional filter by recent days."""
@@ -80,17 +89,13 @@ def plot_city_trend(city, days=None):
     dates = [t["date"] for t in trends]
     temps = [t["temp"] for t in trends]
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(dates, temps, marker='o', color='green')
-    title = f"Temperature Trend in {city}"
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(dates, temps, marker='o', linestyle='-', color='#2ca02c', linewidth=2, markersize=5)
+    title = f"📈 Temperature Trend in {city}"
     if days:
         title += f" (Last {days} Days)"
-    plt.title(title)
-    plt.xlabel("Date")
-    plt.ylabel("Temperature (°C)")
+    apply_plot_styling(ax, title, "Temperature (°C)")
     plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.grid(True)
     plt.show()
 
 def export_trends_to_csv():

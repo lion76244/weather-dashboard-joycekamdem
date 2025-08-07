@@ -1,4 +1,3 @@
-# gui.py
 import tkinter as tk
 from tkinter import ttk
 
@@ -8,16 +7,16 @@ from features.data_collection import save_search, load_history
 from features.Trend_detection import log_weather_trend, plot_city_trend, export_trends_to_csv
 
 
-# --- GUI Callback Functions ---
+# --- Callback Functions ---
 def show_weather():
     city = city_entry.get()
     result = fetch_current_weather(city)
 
     if "error" in result:
-        result_label.config(text=result["error"])
+        weather_display.config(text=result["error"])
     else:
-        display = f"🌤️ Weather in {result['city']}:\n{result['description']}, {result['temp']}°C"
-        result_label.config(text=display)
+        display = f"🌤️ {result['city']}\n{result['description']}, {result['temp']}°C"
+        weather_display.config(text=display)
 
         save_search(city, result["temp"])
         log_weather_trend(city, result["temp"])
@@ -31,14 +30,22 @@ def show_humidity_plot():
     city = city_entry.get()
     plot_humidity(city)
 
-def show_trend_plot():
+def show_trend_plot(days=None):
     city = city_entry.get()
-    plot_city_trend(city)
+    plot_city_trend(city, days=days)
 
 def fetch_from_history(city):
     city_entry.delete(0, tk.END)
     city_entry.insert(0, city)
     show_weather()
+
+def toggle_history():
+    if history_frame.winfo_viewable():
+        history_frame.grid_remove()
+        history_btn.config(text="📂 Show Recent Cities")
+    else:
+        history_frame.grid()
+        history_btn.config(text="📂 Hide Recent Cities")
 
 def update_history_buttons():
     for widget in history_frame.winfo_children():
@@ -46,56 +53,96 @@ def update_history_buttons():
 
     history = load_history()
     if history:
-        history_label = ttk.Label(history_frame, text="Recent Cities:", font=("Arial", 10, "bold"))
-        history_label.pack()
+        ttk.Label(history_frame, text="Recent Cities:", font=("Arial", 10, "bold")).grid(row=0, column=0, sticky="w")
 
-    for entry in history:
+    for idx, entry in enumerate(history, start=1):
         city_name = entry["city"]
         display = f"{city_name} ({entry['temp']}°C)"
-        btn = ttk.Button(history_frame, text=display, command=lambda c=city_name: fetch_from_history(c))
-        btn.pack(pady=2)
+        btn = ttk.Button(history_frame, text=display, command=lambda c=city_name: fetch_from_history(c), style="History.TButton")
+        btn.grid(row=idx, column=0, pady=2, sticky="ew")
 
-# --- GUI Layout ---
+
+# --- GUI Setup ---
 root = tk.Tk()
 root.title("Weather Dashboard")
-root.geometry("420x500")
-root.resizable(False, False)
+root.geometry("700x700")
+root.configure(bg="#dbeeff")  # Weather-like light sky blue
 
-# Use modern themed buttons
+# Styles
 style = ttk.Style()
 style.theme_use("clam")
 
-style.configure("TButton", font=("Arial", 10), padding=6)
-style.configure("Accent.TButton", font=("Arial", 10, "bold"), foreground="white", background="#2b8aed")
+# General button style
+style.configure("TButton",
+                font=("Arial", 10),
+                padding=6,
+                background="#ffffff",
+                foreground="#333",
+                borderwidth=1)
+style.map("TButton",
+          background=[("active", "#add8e6")])
 
-# City entry
-city_entry = ttk.Entry(root, width=30, font=("Arial", 12))
-city_entry.pack(pady=10)
-city_entry.insert(0, "Enter city name")
+# Primary action button (Get Weather)
+style.configure("Accent.TButton",
+                font=("Arial", 14, "bold"),
+                foreground="white",
+                background="#4098ff",
+                padding=10)
+style.map("Accent.TButton",
+          background=[("active", "#2f7de6")])
 
-# Weather result display
-result_label = ttk.Label(root, text="", font=("Arial", 12), wraplength=380, justify="center")
-result_label.pack(pady=10)
+# History button style
+style.configure("History.TButton",
+                background="#f0f8ff",
+                foreground="#333")
 
-# Weather fetch button
-ttk.Button(root, text="🌤️ Get Weather", style="Accent.TButton", command=show_weather).pack(pady=5)
+style.configure("TLabel", background="#dbeeff", foreground="#000000")
+style.configure("TFrame", background="#dbeeff")
 
-# Forecast plots
-ttk.Button(root, text="📈 Show Temperature", command=show_temp_plot).pack(pady=2)
-ttk.Button(root, text="💧 Show Humidity", command=show_humidity_plot).pack(pady=2)
-ttk.Button(root, text="📊 Show Trend", command=show_trend_plot).pack(pady=2)
+# --- Layout ---
+city_entry = ttk.Entry(root, width=35, font=("Arial", 12))
+city_entry.grid(row=0, column=0, columnspan=3, padx=20, pady=15)
 
-# Trend time range
-ttk.Button(root, text="🗓️ Trend: 7 Days", command=lambda: plot_city_trend(city_entry.get(), days=7)).pack(pady=2)
-ttk.Button(root, text="📅 Trend: 30 Days", command=lambda: plot_city_trend(city_entry.get(), days=30)).pack(pady=2)
+get_weather_btn = ttk.Button(root, text="🌤️  Get Weather", style="Accent.TButton", command=show_weather)
+get_weather_btn.grid(row=1, column=0, columnspan=3, pady=10)
 
-# Export data
-ttk.Button(root, text="💾 Export Trends to CSV", command=export_trends_to_csv).pack(pady=5)
+weather_display = ttk.Label(root, text="", font=("Arial", 14, "bold"), anchor="center", justify="center", wraplength=600)
+weather_display.grid(row=2, column=0, columnspan=3, pady=20)
 
-# History section
+# --- Forecast Buttons ---
+forecast_frame = ttk.Frame(root)
+forecast_frame.grid(row=3, column=0, columnspan=3, pady=10)
+
+ttk.Label(forecast_frame, text="Forecast Tools:", font=("Arial", 10, "bold")).grid(row=0, column=0, columnspan=2, pady=5)
+ttk.Button(forecast_frame, text="📈 Temperature", command=show_temp_plot).grid(row=1, column=0, padx=10, pady=5)
+ttk.Button(forecast_frame, text="💧 Humidity", command=show_humidity_plot).grid(row=1, column=1, padx=10, pady=5)
+
+# --- Trend Buttons ---
+trend_frame = ttk.Frame(root)
+trend_frame.grid(row=4, column=0, columnspan=3, pady=10)
+
+ttk.Label(trend_frame, text="Trends:", font=("Arial", 10, "bold")).grid(row=0, column=0, columnspan=3, pady=5)
+ttk.Button(trend_frame, text="📊 Show Trend", command=lambda: show_trend_plot()).grid(row=1, column=0, padx=10, pady=5)
+ttk.Button(trend_frame, text="🗓️  7 Days", command=lambda: show_trend_plot(days=7)).grid(row=1, column=1, padx=10, pady=5)
+ttk.Button(trend_frame, text="📅 30 Days", command=lambda: show_trend_plot(days=30)).grid(row=1, column=2, padx=10, pady=5)
+
+# --- Export ---
+export_frame = ttk.Frame(root)
+export_frame.grid(row=5, column=0, columnspan=3, pady=10)
+ttk.Button(export_frame, text="💾 Export to CSV", command=export_trends_to_csv).pack()
+
+# --- History Toggle Button ---
+history_btn = ttk.Button(root, text="📂 Show Recent Cities", command=toggle_history)
+history_btn.grid(row=6, column=0, columnspan=3, pady=10)
+
+# --- History Frame (hidden initially) ---
 history_frame = ttk.Frame(root)
-history_frame.pack(pady=10)
+history_frame.grid(row=7, column=0, columnspan=3, pady=10, sticky="ew")
 update_history_buttons()
+history_frame.grid_remove()  # Start hidden
 
-# Start the GUI
+# Center columns
+for i in range(3):
+    root.grid_columnconfigure(i, weight=1)
+
 root.mainloop()

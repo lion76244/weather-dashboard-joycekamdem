@@ -1,61 +1,63 @@
-import requests
-import os
-import matplotlib.pyplot as plt
-from dotenv import load_dotenv
-
-# Load API key
-load_dotenv()
-api_key = os.getenv("OPENWEATHER_API_KEY")
-
-def get_forecast_data(city):
-    if not api_key:
-        raise ValueError("❌ API key not found. Make sure OPENWEATHER_API_KEY is set.")
-
-    url = "http://api.openweathermap.org/data/2.5/forecast"
-    params = {
-        "q": city,
-        "appid": api_key,
-        "units": "metric"
-    }
-
-    response = requests.get(url, params=params)
-    if response.status_code != 200:
-        raise Exception(f"❌ Error {response.status_code}: {response.text}")
-
-    return response.json()
+import plotly.graph_objects as go
+from datetime import datetime
+from api import get_forecast_data
 
 def plot_temperature(city):
+    """Interactive Plotly chart for temperature forecast."""
     data = get_forecast_data(city)
-    times = [entry["dt_txt"] for entry in data["list"]]
+    times = [datetime.strptime(entry["dt_txt"], "%Y-%m-%d %H:%M:%S") for entry in data["list"]]
     temps = [entry["main"]["temp"] for entry in data["list"]]
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(times, temps, marker='o', linestyle='-', color='orange')
-    plt.xticks(rotation=45, ha="right")
-    plt.title(f"Temperature Forecast for {city}")
-    plt.xlabel("Time")
-    plt.ylabel("Temperature (°C)")
-    plt.tight_layout()
-    plt.grid(True)
-    plt.show()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=times,
+        y=temps,
+        mode='lines+markers',
+        name='Temperature',
+        line=dict(color='orange', width=3),
+        marker=dict(size=8),
+        hovertemplate='Temp: %{y}°C<br>Time: %{x}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        title=f"🌡️ Temperature Forecast for {city}",
+        xaxis_title="Time",
+        yaxis_title="Temperature (°C)",
+        plot_bgcolor="#fdfaf6",
+        font=dict(family="Arial", size=14),
+        hovermode="x unified",
+        xaxis=dict(showgrid=True, tickangle=45),
+        yaxis=dict(showgrid=True)
+    )
+
+    fig.show()
 
 def plot_humidity(city):
+    """Interactive Plotly chart for humidity forecast."""
     data = get_forecast_data(city)
-    times = [entry["dt_txt"] for entry in data["list"]]
+    times = [datetime.strptime(entry["dt_txt"], "%Y-%m-%d %H:%M:%S") for entry in data["list"]]
     humidity = [entry["main"]["humidity"] for entry in data["list"]]
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(times, humidity, marker='x', linestyle='-', color='blue')
-    plt.xticks(rotation=45, ha="right")
-    plt.title(f"Humidity Forecast for {city}")
-    plt.xlabel("Time")
-    plt.ylabel("Humidity (%)")
-    plt.tight_layout()
-    plt.grid(True)
-    plt.show()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=times,
+        y=humidity,
+        mode='lines+markers',
+        name='Humidity',
+        line=dict(color='skyblue', width=3),
+        marker=dict(size=8),
+        hovertemplate='Humidity: %{y}%<br>Time: %{x}<extra></extra>'
+    ))
 
-# Example usage
-if __name__ == "__main__":
-    city_name = input("Enter city name: ")
-    plot_temperature(city_name)
-    plot_humidity(city_name)
+    fig.update_layout(
+        title=f"💧 Humidity Forecast for {city}",
+        xaxis_title="Time",
+        yaxis_title="Humidity (%)",
+        plot_bgcolor="#f0fbff",
+        font=dict(family="Arial", size=14),
+        hovermode="x unified",
+        xaxis=dict(showgrid=True, tickangle=45),
+        yaxis=dict(showgrid=True)
+    )
+
+    fig.show()
